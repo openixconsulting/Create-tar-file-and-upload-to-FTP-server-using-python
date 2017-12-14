@@ -1,0 +1,35 @@
+#!/usr/bin/env python3.5
+import tarfile
+import os
+import ftplib
+import datetime
+import sys
+
+now = datetime.date.today()
+
+file_to_upload = "/root/backup/home-{}.tar.gz".format(now)
+
+def create_tar_file():
+        tar = tarfile.open(file_to_upload, "w:gz")
+        os.chdir("/home")
+        for name in os.listdir("."):
+                tar.add(name)
+        tar.close()
+
+def push_file_to_server():
+        server = '192.168.36.8'
+        username = 'test_account'
+        password = 'welcome123'
+        ftp_connection = ftplib.FTP(server, username, password)
+        remote_path = "/ftp/"
+        ftp_connection.cwd(remote_path)
+        fh = open(file_to_upload, 'rb')
+        ftp_connection.storbinary('STOR %s' % os.path.basename(file_to_upload), fh)
+        fh.close()
+
+if __name__ == "__main__":
+        create_tar_file()
+        push_file_to_server()
+
+
+
